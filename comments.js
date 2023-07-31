@@ -1,32 +1,27 @@
-// create web server
-// create http server
-// create socket server
-// create websocket server
-// create websocket client
-// create socket client
-// create http client
-// create web client
-// create web socket
-// create socket
-// create http
-// create web
-// create server
-// create client
-// create websocket
-// create
-// server
-// client
-// websocket
-// websocket
-// socket
-// http
-// web
-// web
-// socket
-// http
-// http
-// web
-// socket
-// http
-// http
-// socket
+// Create web server
+
+// Import modules   
+const express = require('express');
+const router = express.Router();
+const Comment = require('../models/comment');
+const Post = require('../models/post');
+const User = require('../models/user');
+const { isLoggedIn } = require('../middleware');
+
+// Create comment
+router.post('/posts/:id/comments', isLoggedIn, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        const comment = new Comment(req.body.comment);
+        comment.author = req.user._id;
+        post.comments.push(comment);
+        await comment.save();
+        await post.save();
+        req.flash('success', 'Created a comment!');
+        res.redirect(`/posts/${post._id}`);
+    } catch (err) {
+        req.flash('error', 'Cannot create comment!');
+        res.redirect('back');
+    }
+}
+);
