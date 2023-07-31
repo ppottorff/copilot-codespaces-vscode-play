@@ -1,19 +1,27 @@
 // create web server
 const express = require('express');
+// create router
 const router = express.Router();
-const commentsCtrl = require('../controllers/comments');
-const auth = require('../middleware/auth');
-const multer = require('../middleware/multer-config');
+// create comment model
+const Comment = require('../models/comment');
 
-// post comment
-router.post('/', auth, multer, commentsCtrl.createComment);
-// get all comments
-router.get('/', auth, commentsCtrl.getAllComments);
-// get one comment
-router.get('/:id', auth, commentsCtrl.getOneComment);
-// update comment
-router.put('/:id', auth, multer, commentsCtrl.modifyComment);
-// delete comment
-router.delete('/:id', auth, commentsCtrl.deleteComment);
+// create route for post comment
+router.post('/post-comment', (req, res) => {
+    // create comment object
+    const comment = new Comment({
+        name: req.body.name,
+        email: req.body.email,
+        comment: req.body.comment
+    });
+    // save comment
+    comment.save()
+        .then((result) => {
+            res.redirect('/');
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+});
 
+// export router
 module.exports = router;
